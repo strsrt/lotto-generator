@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로또 행운번호 생성기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 0.95em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            width: 80px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .lottery-set {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.2s;
+        }
+
+        .lottery-set:hover {
+            transform: translateY(-2px);
+        }
+
+        .set-number {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .numbers {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .number {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #667eea;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .bonus {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            color: #764ba2;
+        }
+
+        .bonus-number {
+            width: 40px;
+            height: 40px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(118, 75, 162, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 1.1em;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: #fff;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .number {
+                width: 40px;
+                height: 40px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 로또 행운번호</h1>
+        <p class="subtitle">자동 생성기</p>
+
+        <div class="controls">
+            <label for="count">생성 개수:</label>
+            <input type="number" id="count" min="1" max="20" value="5">
+            <button onclick="generateLottery()">번호 생성</button>
+            <button onclick="copyAllNumbers()" style="background: #4CAF50;">복사</button>
+        </div>
+
+        <div id="results" class="results">
+            <div class="empty-state">버튼을 클릭하여 행운번호를 생성해보세요!</div>
+        </div>
+    </div>
+
+    <script>
+        let lastNumbers = [];
+
+        function generateLottery() {
+            const count = parseInt(document.getElementById('count').value) || 1;
+
+            if (count < 1 || count > 20) {
+                alert('1 ~ 20개 사이의 개수를 입력해주세요.');
+                return;
+            }
+
+            lastNumbers = [];
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const numbers = generateNumbers();
+                const bonus = generateBonus();
+                lastNumbers.push({ numbers, bonus });
+
+                const setHTML = `
+                    <div class="lottery-set">
+                        <div class="set-number">세트 ${i + 1}</div>
+                        <div class="numbers">
+                            ${numbers.map(n => `<div class="number">${n}</div>`).join('')}
+                            <div class="bonus">
+                                보너스:
+                                <div class="bonus-number">${bonus}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultsDiv.innerHTML += setHTML;
+            }
+        }
+
+        function generateNumbers() {
+            const numbers = [];
+            while (numbers.length < 6) {
+                const num = Math.floor(Math.random() * 45) + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            return numbers.sort((a, b) => a - b);
+        }
+
+        function generateBonus() {
+            return Math.floor(Math.random() * 45) + 1;
+        }
+
+        function copyAllNumbers() {
+            if (lastNumbers.length === 0) {
+                alert('먼저 번호를 생성해주세요.');
+                return;
+            }
+
+            const text = lastNumbers.map((set, i) => {
+                return `세트 ${i + 1}: ${set.numbers.join(', ')} (보너스: ${set.bonus})`;
+            }).join('\n');
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('번호가 복사되었습니다!');
+            });
+        }
+
+        // 페이지 로드 시 기본 생성
+        window.addEventListener('load', () => {
+            generateLottery();
+        });
+    </script>
+</body>
+</html>

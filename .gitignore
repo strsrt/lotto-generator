@@ -1,0 +1,17 @@
+# Project specific
+pm25-alert-system/
+pm25-alert-system.skill
+.DS_Store
+node_modules/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
